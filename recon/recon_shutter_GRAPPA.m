@@ -1,10 +1,10 @@
 %%%%%%%%%%% Shutter EPI Recon %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-addpath util
-addpath util/grappa_uniq
+addpath util % general functions
+addpath util/grappa_uniq % GRAPPA functions
 
 % recon parameters
-refcorrect = true; % apply truncated singular value ACS correction (shuttered recon only)
+refcorrect = true; % apply truncated singular value ACS correction (not needed for FullEX)
 
 moco = false % motion correction flag
 motionAngles = -10 : 0.125 : 10; % degrees, tested motion angles
@@ -13,8 +13,8 @@ phsCorr = 'after' %'after'; % estimate and perform phase correction 'after' GRAP
 phsN = 8; % size of low-res neighborhood for phase correction
 
 %% Motion Data
-%dataset = 'datalist_20210511 FullEX pos 1';
-%swapRefDataShotsCoils = true;
+dataset = 'datalist_20210511 FullEX pos 1'; % FullEX, pos 1, 2, 3
+%dataset = 'datalist_20210511 pos 1'; % Shuttered, pos 1, 2, 3
 
 %% Subject a tSNR
 %dataset = '20211108_Anderson_344232 FullEX Series 9 tSNR'; % FullEX
@@ -34,7 +34,7 @@ phsN = 8; % size of low-res neighborhood for phase correction
 
 %% Subject c tSNR
 %dataset = '20211108_Anderson_344229 FullEX Series 17 tSNR'; % FullEX
-dataset = '20211108_Anderson_344229 Shutter Series 24 tSNR'; % Shuttered
+%dataset = '20211108_Anderson_344229 Shutter Series 24 tSNR'; % Shuttered
 
 %% Subject c fMRI
 %dataset = '20211108_Anderson_344229 FullEX Series 21 Visual'; % FullEX
@@ -43,13 +43,13 @@ dataset = '20211108_Anderson_344229 Shutter Series 24 tSNR'; % Shuttered
 % filename to save recons into
 fNameSave = dataset; 
 
-path_name = '../../data/fMRI/'; % fMRI and tSNR
-%dataPath = '../../data/motion/'; % motion
+%path_name = '../../data/fMRI/'; % fMRI and tSNR
+path_name = '../../data/motion/'; % motion
 
 retrospective = false; 
 % which slices to reconstruct?
-%slices = 5; % motion
-slices = 4; % fMRI
+slices = 5; % motion; the displayed slice in the paper
+%slices = 4; % fMRI; the displayed slice in the paper
 nSlices = length(slices);
 % the following are only relevant if retrospective == false
 accDataInd = [1]; % which accelerated data set(s) to use, within this data
@@ -74,7 +74,7 @@ grappap.Nx = 3;     % kernel extent in frequency-encoded direction
 grappap.Ny = 4;     % kernel extent in primary phase-encoded direction   (a.k.a., Nblocks1)
 grappap.code = 'convacclines'; % 'Jon', 'conv', 'uniq', or 'convacclines'
 grappap.ndyn_fit = 10; % number of dynamic images to average for use in fitting the kernel
-grappap.lambda_all_convacc = 10^-3;
+grappap.lambda_all_convacc = 10^-3; % kernel regularization parameter
 
 %%%% Read Reference Shutter Data ----------------------------------------/
 disp 'Reading Reference Shutter Data'
@@ -350,7 +350,7 @@ for sl = 1 : nSlices
         % initialize rotation dictionary for this slice
         rotDict = [];
     end
-    for dd = 10 %1 : nDyns 
+    for dd = 1 : nDyns 
 
         disp(['Starting on dyn ' num2str(dd) '/' num2str(nDyns) '; slice ' num2str(sl) '/' num2str(nSlices)]);
 
