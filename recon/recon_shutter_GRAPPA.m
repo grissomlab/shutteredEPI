@@ -4,95 +4,58 @@ addpath util
 addpath util/grappa_uniq
 
 % recon parameters
-refSaveData = false;
-accSaveData = false;
-refcorrect = true;
-echoByEchoPHCCorr = false;
-separateSlicePHCCorr = false;
-moco = false 
-motionAngles = -10 : 0.125 : 10;
-motionShifts = -10 : 0.125 : 10;
+refcorrect = true; % apply truncated singular value ACS correction (shuttered recon only)
+
+moco = false % motion correction flag
+motionAngles = -10 : 0.125 : 10; % degrees, tested motion angles
+motionShifts = -10 : 0.125 : 10; % voxels, tested displacements in x and y
 phsCorr = 'after' %'after'; % estimate and perform phase correction 'after' GRAPPA, or 'none'
-phsN = 8;
+phsN = 8; % size of low-res neighborhood for phase correction
 
-% Data selection
-%dataset = '20190117_phantomMotion'; % 
-%dataset = '20171102_Datalist_Human'; % original single-slice data
-%dataset = 'datalist_20200902 copy pos 1'; % two-position 25-slice brain data
-%dataset = 'datalist_20200902 FullEX pos 1'; % two-position 25-slice FULLEX brain data
-%dataset = 'datalist_20190122_pos_1'; % two-position single-slice brain data
-%dataset = 'datalist_20210511 FullEX pos 3';
-%fNameSave = 'FullEX_20210511_pos_3_1111_nomoco_conv'
-%dataset = 'datalist_20210511 pos 3'; % three-position brain data with 
-%fNameSave = 'Shutter_20210511_pos_3_1111_nomoco_conv'
+%% Motion Data
+%dataset = 'datalist_20210511 FullEX pos 1';
 %swapRefDataShotsCoils = true;
 
-%% 6/24 FullEX
-%dataset = 'datalist_20210624 FullEX Series 13 Breathhold';
-%fNameSave = 'FullEX_Series_13_Breathhold_moco_chi10ov100_phsN8';
-%dataset = 'datalist_20210624 FullEX Series 15 Visual';
-%fNameSave = 'FullEX_Series_15_Visual_moco_chi10ov100_phsN8';
-%dataset = 'datalist_20210624 FullEX Series 21 Breathhold'; % Jonathan 
-%fNameSave = 'FullEX_Series_21_Breathhold_moco_chi10ov100_phsN8';   
-%dataset = 'datalist_20210624 FullEX Series 23 Visual'; % Jonathan 
-%fNameSave = 'FullEX_Series_23_Visual_nophscorr_moco_chi10ov100_slice4'   
+%% Subject a tSNR
+%dataset = '20211108_Anderson_344232 FullEX Series 9 tSNR'; % FullEX
+%dataset = '20211108_Anderson_344232 Shutter Series 14 tSNR' % Shuttered
 
-%% 6/24 Shuttered
-%dataset = 'datalist_20210624 Shutter Series 9 Breathhold';
-%fNameSave = 'Shutter_Series_9_Breathhold_moco_chi10ov100_phsN8'
-%dataset = 'datalist_20210624 Shutter Series 17 Breathhold';
-%fNameSave = 'Shutter_Series_17_Breathhold_moco_chi10ov100_phsN8'
-%dataset = 'datalist_20210624 Shutter Series 19 Visual';
-%fNameSave = 'Shutter_Series_19_Visual_nophscorr_moco_chi10ov100_slice4'
-%swapRefDataShotsCoils = true;
+%% Subject a fMRI
+%dataset = '20211108_Anderson_344232 FullEX Series 11 Visual'; % FullEX
+%dataset = '20211108_Anderson_344232 Shutter Series 16 Visual' % Shuttered
 
-%% 11/08 FullEX
-%dataset = '20211108_Anderson_344229 FullEX Series 17 tSNR'; % Jonathan 
-%fNameSave = '20211108_Anderson_344229_FullEX_Series_17_tSNR_norefcorr_test'   
-%dataset = '20211108_Anderson_344229 FullEX Series 21 Visual'; % Jonathan 
-%fNameSave = '20211108_Anderson_344229_FullEX_Series_21_Visual_moco_phscorr_conv'   
+%% Subject b tSNR
+%dataset = '20211116_Anderson_344321 FullEX Series 13 tSNR'; % FullEX
+%dataset = '20211116_Anderson_344321 Shutter Series 18 tSNR'; % Shuttered
 
-%dataset = '20211108_Anderson_344232 FullEX Series 9 tSNR'; % Abitha
-%fNameSave = '20211108_Anderson_344232_FullEX_Series_9_tSNR_moco_phscorr_conv'
-%dataset = '20211108_Anderson_344232 FullEX Series 11 Visual'; % Abitha
-%fNameSave = '20211108_Anderson_344232_FullEX_Series_11_Visual_moco_phscorr_conv'
+%% Subject b fMRI
+%dataset = '20211116_Anderson_344321 FullEX Series 15 Visual'; % FullEX
+%dataset = '20211116_Anderson_344321 Shutter Series 20 Visual'; % Shuttered
 
-%% 11/08 Shuttered
-dataset = '20211108_Anderson_344229 Shutter Series 24 tSNR'; % Jonathan
-%fNameSave = '20211108_Anderson_344229_Shutter_Series_24_tSNR_moco_phscorr_conv'
-%dataset = '20211108_Anderson_344229 Shutter Series 26 Visual'; % Jonathan
-%fNameSave = '20211108_Anderson_344229_Shutter_Series_26_Visual_moco_phscorr_conv'
+%% Subject c tSNR
+%dataset = '20211108_Anderson_344229 FullEX Series 17 tSNR'; % FullEX
+dataset = '20211108_Anderson_344229 Shutter Series 24 tSNR'; % Shuttered
 
-%dataset = '20211108_Anderson_344232 Shutter Series 14 tSNR' % Abitha
-%fNameSave = '20211108_Anderson_344232_Shutter_Series_14_tSNR_moco_phscorr_conv_refcorr'
-%dataset = '20211108_Anderson_344232 Shutter Series 16 Visual' % Abitha
-%fNameSave = '20211108_Anderson_344232_Shutter_Series_16_Visual_moco_phscorr_conv'
+%% Subject c fMRI
+%dataset = '20211108_Anderson_344229 FullEX Series 21 Visual'; % FullEX
+%dataset = '20211108_Anderson_344229 Shutter Series 26 Visual'; % Shuttered
 
+% filename to save recons into
+fNameSave = dataset; 
 
-%% 11/16 FullEX
-%dataset = '20211116_Anderson_344321 FullEX Series 13 tSNR'
-%fNameSave = '20211116_Anderson_344321_FullEX_Series_13_tSNR_moco_phscorr_conv'
-%dataset = '20211116_Anderson_344321 FullEX Series 15 Visual'
-%fNameSave = '20211116_Anderson_344321_FullEX_Series_15_Visual_moco_phscorr_conv'
-
-%% 11/16 Shuttered
-%dataset = '20211116_Anderson_344321 Shutter Series 18 tSNR'
-%fNameSave = '20211116_Anderson_344321_Shutter_Series_18_tSNR_moco_phscorr_conv_refcorr'
-%dataset = '20211116_Anderson_344321 Shutter Series 20 Visual'
-%fNameSave = '20211116_Anderson_344321_Shutter_Series_20_Visual_moco_phscorr_conv_refcorr'
-
+path_name = '../../data/fMRI/'; % fMRI and tSNR
+%dataPath = '../../data/motion/'; % motion
 
 retrospective = false; 
 % which slices to reconstruct?
-%slices = 1 : 15; % motion cases
-%slices = 1 : 7; % fMRI
-slices = 4;
+%slices = 5; % motion
+slices = 4; % fMRI
 nSlices = length(slices);
 % the following are only relevant if retrospective == false
 accDataInd = [1]; % which accelerated data set(s) to use, within this data
 shotSelect = [1 1 1 1]; % which index into accDataInd to take each shot from
 
-[fnames, path_name, params] = shutterData(dataset, machine);
+[fnames, params] = shutterData(dataset);
 nCoils = params.nCoils;
 nShots = params.nShots;
 nSlicesData = params.nSlices;
@@ -123,15 +86,15 @@ if ~fullEXAcq
             
             % read in and phase+delay-correct
             data_Ref(:, :, :, :, n) = readPhsCorrCropData( ...
-                path_name, fnames.shutterRef{n}, refSaveData, multislice, ...
-                echoByEchoPHCCorr, separateSlicePHCCorr, slices);
+                path_name, fnames.shutterRef{n}, false, multislice, ...
+                false, false, slices);
 
         end
     else % All reference data are in a single raw data file
 
         data_Ref = readPhsCorrCropData( ...
-                path_name, fnames.shutterRef{1}, refSaveData, multislice, ...
-                echoByEchoPHCCorr, separateSlicePHCCorr, slices);
+                path_name, fnames.shutterRef{1}, false, multislice, ...
+                false, false, slices);
         if swapRefDataShotsCoils
             data_Ref = reshape(data_Ref, [Nro, Npe * nShots * R, nSlices, nCoils, nShots]);
         else
@@ -174,9 +137,6 @@ if ~fullEXAcq
                     data_Ref(:, :, sl, :, nn) = data_corr;
                 end
             end 
-            %data_Ref = data_Ref_corr;
-        %else
-        %    load foo
         end 
 
     end
@@ -184,8 +144,8 @@ if ~fullEXAcq
 else % FullEX
     
     data_Ref = readPhsCorrCropData( ...
-        path_name, fnames.shutterRef{1}, refSaveData, multislice, ...
-        echoByEchoPHCCorr, separateSlicePHCCorr, slices);
+        path_name, fnames.shutterRef{1}, false, multislice, ...
+        false, false, slices);
     
     if refcorrect == true 
         % correct the relative amplitudes and phases of each shot
@@ -248,7 +208,7 @@ if ~retrospective
 
     for ii = 1 : length(accDataInd)
         data_Acc_tmp = readPhsCorrCropData(path_name, fnames.shutterAcc{accDataInd(ii)}, ...
-            accSaveData, multislice, echoByEchoPHCCorr, separateSlicePHCCorr, slices);
+            false, multislice, false, false, slices);
         if ~multislice
             % add a dimension where the slices would be
             data_Acc_tmp = permute(data_Acc_tmp, [1 4 2 3 5]);
@@ -415,18 +375,8 @@ for sl = 1 : nSlices
  
             if moco
                 % get the reference image for this shot
-                if ~fullEXAcq
-                    % for motion correction
-                    %tmp = img_indShot_ref(:, :, :, :, sl);
-                    %img_Ref_moco = ssq(tmp(:, :, :), 3);
-                    img_Ref_moco = img_Ref_comb(:, :, sl);
-                    %img_Ref_moco = ssq(sqz(img_indShot_ref(:, :, n, :, sl)), 3);
-                    % for fMRI Runs
-                    %img_Ref_moco = ssq(sqz(img_Ref(:, :, sl, :, n)), 3);
-                else 
-                    img_Ref_moco = img_Ref_comb(:, :, sl);
-                end
-
+                img_Ref_moco = img_Ref_comb(:, :, sl);
+                
                 % get this shot's image
                 img_moved_shot = ssq(sqz(img_indShot(:, :, n, :)), 3);
 
