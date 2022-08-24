@@ -15,7 +15,6 @@ switch dataset
         params.slIndDisp = 10; % slice index for display 
         params.fullEXAcq = false;
         params.swapRefDataShotsCoils = false;
-        params.sepRefScans = false;
 
     case 'datalist_20210511 FullEX pos 1'
         fnames.shutterRef = {'raw_51117'}; % reference data
@@ -28,7 +27,6 @@ switch dataset
         params.R = 3;
         params.slIndDisp = 6; % slice index for display 
         params.fullEXAcq = true;
-        params.sepRefScans = false;
 
     case 'datalist_20210511 pos 2'
         fnames.shutterRef = {'raw_51129'}; % reference data
@@ -42,7 +40,6 @@ switch dataset
         params.slIndDisp = 10; % slice index for display 
         params.fullEXAcq = false;
         params.swapRefDataShotsCoils = true;
-        params.sepRefScans = false;
 
     case 'datalist_20210511 FullEX pos 2'
         fnames.shutterRef = {'raw_51127'}; % reference data
@@ -55,7 +52,6 @@ switch dataset
         params.R = 3;
         params.slIndDisp = 6; % slice index for display 
         params.fullEXAcq = true;
-        params.sepRefScans = false;
 
     case 'datalist_20210511 pos 3'
         fnames.shutterRef = {'raw_51110'}; % reference data
@@ -69,7 +65,6 @@ switch dataset
         params.slIndDisp = 10; % slice index for display 
         params.fullEXAcq = false;
         params.swapRefDataShotsCoils = true;
-        params.sepRefScans = false;
 
     case 'datalist_20210511 FullEX pos 3'
         fnames.shutterRef = {'raw_51108'}; % reference data
@@ -82,7 +77,6 @@ switch dataset
         params.R = 3;
         params.slIndDisp = 6; % slice index for display 
         params.fullEXAcq = true;
-        params.sepRefScans = false;
 
     case '20211108_Anderson_344229 FullEX Series 17 tSNR'
         fnames.shutterRef = {'raw_110816'};
@@ -95,7 +89,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = true;
-        params.sepRefScans = false; 
 
     case '20211108_Anderson_344229 FullEX Series 21 Visual'
         fnames.shutterRef = {'raw_110820'};
@@ -108,7 +101,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = true;
-        params.sepRefScans = false; 
 
     case '20211108_Anderson_344232 FullEX Series 9 tSNR' % Subject a
         fnames.shutterRef = {'raw_110881'};
@@ -121,7 +113,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = true;
-        params.sepRefScans = false; 
 
     case '20211108_Anderson_344232 FullEX Series 11 Visual' % Subject a
         fnames.shutterRef = {'raw_1108101'};
@@ -134,7 +125,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = true;
-        params.sepRefScans = false; 
 
     case '20211108_Anderson_344229 Shutter Series 24 tSNR'
         fnames.shutterRef = {'raw_110823'};
@@ -147,7 +137,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = false;
-        params.sepRefScans = false; 
         params.swapRefDataShotsCoils = true;
 
     case '20211108_Anderson_344229 Shutter Series 26 Visual'
@@ -161,7 +150,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = false;
-        params.sepRefScans = false; 
         params.swapRefDataShotsCoils = true;
 
     case '20211108_Anderson_344232 Shutter Series 14 tSNR' % Subject a
@@ -175,7 +163,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = false;
-        params.sepRefScans = false; 
         params.swapRefDataShotsCoils = true;
 
     case '20211108_Anderson_344232 Shutter Series 16 Visual' % Subject a
@@ -189,7 +176,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = false;
-        params.sepRefScans = false; 
         params.swapRefDataShotsCoils = true;
 
     case '20211116_Anderson_344321 FullEX Series 13 tSNR' % Subject b
@@ -203,7 +189,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = true;
-        params.sepRefScans = false; 
 
     case '20211116_Anderson_344321 FullEX Series 15 Visual' % Subject b
         fnames.shutterRef = {'raw_111614'};
@@ -216,7 +201,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = true;
-        params.sepRefScans = false; 
 
     case '20211116_Anderson_344321 Shutter Series 18 tSNR' % Subject b
         fnames.shutterRef = {'raw_111617'};
@@ -229,7 +213,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = false;
-        params.sepRefScans = false; 
         params.swapRefDataShotsCoils = true;
 
     case '20211116_Anderson_344321 Shutter Series 20 Visual' % Subject b
@@ -243,7 +226,6 @@ switch dataset
         params.R = 4;
         params.slIndDisp = 4;
         params.fullEXAcq = false;
-        params.sepRefScans = false; 
         params.swapRefDataShotsCoils = true;
 
     otherwise

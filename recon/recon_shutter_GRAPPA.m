@@ -13,12 +13,12 @@ phsCorr = 'after' %'after'; % estimate and perform phase correction 'after' GRAP
 phsN = 8; % size of low-res neighborhood for phase correction
 
 %% Motion Data
-dataset = 'datalist_20210511 FullEX pos 1'; % FullEX, pos 1, 2, 3
-%dataset = 'datalist_20210511 pos 1'; % Shuttered, pos 1, 2, 3
+%dataset = 'datalist_20210511 FullEX pos 1'; % FullEX, 'pos 1', 'pos 2', or 'pos 3' as the reference position
+%dataset = 'datalist_20210511 pos 1'; % Shuttered, 'pos 1', 'pos 2', or 'pos 3' as the reference position
 
 %% Subject a tSNR
 %dataset = '20211108_Anderson_344232 FullEX Series 9 tSNR'; % FullEX
-%dataset = '20211108_Anderson_344232 Shutter Series 14 tSNR' % Shuttered
+dataset = '20211108_Anderson_344232 Shutter Series 14 tSNR' % Shuttered
 
 %% Subject a fMRI
 %dataset = '20211108_Anderson_344232 FullEX Series 11 Visual'; % FullEX
@@ -43,13 +43,13 @@ dataset = 'datalist_20210511 FullEX pos 1'; % FullEX, pos 1, 2, 3
 % filename to save recons into
 fNameSave = dataset; 
 
-%path_name = '../../data/fMRI/'; % fMRI and tSNR
-path_name = '../../data/motion/'; % motion
+path_name = '../../data/fMRI/'; % fMRI and tSNR
+%path_name = '../../data/motion/'; % motion
 
 retrospective = false; 
 % which slices to reconstruct?
-slices = 5; % motion; the displayed slice in the paper
-%slices = 4; % fMRI; the displayed slice in the paper
+%slices = 5; % motion; the displayed slice in the paper
+slices = 4; % fMRI; the displayed slice in the paper
 nSlices = length(slices);
 % the following are only relevant if retrospective == false
 accDataInd = [1]; % which accelerated data set(s) to use, within this data
@@ -59,7 +59,6 @@ shotSelect = [1 1 1 1]; % which index into accDataInd to take each shot from
 nCoils = params.nCoils;
 nShots = params.nShots;
 nSlicesData = params.nSlices;
-sepRefScans = params.sepRefScans;
 multislice = nSlicesData > 1;
 R = params.R;
 Nro = params.Nro;
@@ -80,66 +79,54 @@ grappap.lambda_all_convacc = 10^-3; % kernel regularization parameter
 disp 'Reading Reference Shutter Data'
 if ~fullEXAcq
 
-    if sepRefScans % Each shot's reference scan was collected separately, in different raw data files
-        data_Ref = zeros([N, N, nSlices, nCoils, nShots]);
-        for n = 1 : nShots
-            
-            % read in and phase+delay-correct
-            data_Ref(:, :, :, :, n) = readPhsCorrCropData( ...
-                path_name, fnames.shutterRef{n}, false, multislice, ...
-                false, false, slices);
+    % All reference data are in a single raw data file
 
-        end
-    else % All reference data are in a single raw data file
-
-        data_Ref = readPhsCorrCropData( ...
-                path_name, fnames.shutterRef{1}, false, multislice, ...
-                false, false, slices);
-        if swapRefDataShotsCoils
-            data_Ref = reshape(data_Ref, [Nro, Npe * nShots * R, nSlices, nCoils, nShots]);
-        else
-            data_Ref = reshape(data_Ref, [Nro, Npe * nShots * R, nSlices, nShots, nCoils]);
-            data_Ref = permute(data_Ref, [1 2 3 5 4]);
-        end
-        % we have to time-reverse it!
-        data_Ref = data_Ref(:, :, :, :, nShots : -1 : 1); 
-
-        if refcorrect == true 
-            % correct the relative amplitudes and phases of each shot
-            % this is based on the idea that if the shots are not properly equalized,
-            % then the ACS matrix will have a high rank because there will not be 
-            % a single shift-invariant kernel that works across all shots.
-            % so if we force the ACS matrix to have lower rank then that should suppress 
-            % the aliases somewhat and we can adjust the shot amplitudes and phases to be 
-            % consistent with those lower aliases.
-            %data_Ref_corr = zeros(size(data_Ref));
-            for sl = 1 : nSlices 
-                for nn = 1 : nShots 
-                    disp(['Correcting reference data for shot ' num2str(nn) '/' num2str(nShots) ' of slice ' num2str(sl) '/' num2str(nSlices)]);
-                    data_corr = sqz(data_Ref(:,:,sl,:,nn));
-                    data_orig = sqz(data_Ref(:,:,sl,:,nn));
-                    for kk = 1 : 5 % iterations
-                        A = im2row(data_corr, [6 6]);
-                        A = reshape(A, [size(A, 1), 6*6*nCoils]);
-                        [u, s, v] = svd(A, 'econ');
-                        s = max(0, s - s(3*nCoils, 3*nCoils));
-                        At = u * s * v';
-                        datat = row2im(reshape(At, [size(A, 1), 6*6, nCoils]), ...
-                            [size(data_Ref, 1) size(data_Ref, 2)], [6, 6]);
-                        % normalize overall scaling
-                        datat = datat * (datat(:) \ data_orig(:)); 
-                        % loop over shots and correct amplitude and phase shifts
-                        for ii = 1 : R*nShots
-                            data_corr(:, ii:R*nShots:end, :) = data_corr(:, ii:R*nShots:end, :) * ...
-                                (col(data_corr(:, ii:R*nShots:end, :)) \ col(datat(:, ii:R*nShots:end, :)));
-                        end
-                    end
-                    data_Ref(:, :, sl, :, nn) = data_corr;
-                end
-            end 
-        end 
-
+    data_Ref = readPhsCorrCropData( ...
+            path_name, fnames.shutterRef{1}, false, multislice, ...
+            false, false, slices);
+    if swapRefDataShotsCoils
+        data_Ref = reshape(data_Ref, [Nro, Npe * nShots * R, nSlices, nCoils, nShots]);
+    else
+        data_Ref = reshape(data_Ref, [Nro, Npe * nShots * R, nSlices, nShots, nCoils]);
+        data_Ref = permute(data_Ref, [1 2 3 5 4]);
     end
+    % we have to time-reverse it!
+    data_Ref = data_Ref(:, :, :, :, nShots : -1 : 1); 
+
+    if refcorrect == true 
+        % correct the relative amplitudes and phases of each shot
+        % this is based on the idea that if the shots are not properly equalized,
+        % then the ACS matrix will have a high rank because there will not be 
+        % a single shift-invariant kernel that works across all shots.
+        % so if we force the ACS matrix to have lower rank then that should suppress 
+        % the aliases somewhat and we can adjust the shot amplitudes and phases to be 
+        % consistent with those lower aliases.
+        %data_Ref_corr = zeros(size(data_Ref));
+        for sl = 1 : nSlices 
+            for nn = 1 : nShots 
+                disp(['Correcting reference data for shot ' num2str(nn) '/' num2str(nShots) ' of slice ' num2str(sl) '/' num2str(nSlices)]);
+                data_corr = sqz(data_Ref(:,:,sl,:,nn));
+                data_orig = sqz(data_Ref(:,:,sl,:,nn));
+                for kk = 1 : 5 % iterations
+                    A = im2row(data_corr, [6 6]);
+                    A = reshape(A, [size(A, 1), 6*6*nCoils]);
+                    [u, s, v] = svd(A, 'econ');
+                    s = max(0, s - s(3*nCoils, 3*nCoils));
+                    At = u * s * v';
+                    datat = row2im(reshape(At, [size(A, 1), 6*6, nCoils]), ...
+                        [size(data_Ref, 1) size(data_Ref, 2)], [6, 6]);
+                    % normalize overall scaling
+                    datat = datat * (datat(:) \ data_orig(:)); 
+                    % loop over shots and correct amplitude and phase shifts
+                    for ii = 1 : R*nShots
+                        data_corr(:, ii:R*nShots:end, :) = data_corr(:, ii:R*nShots:end, :) * ...
+                            (col(data_corr(:, ii:R*nShots:end, :)) \ col(datat(:, ii:R*nShots:end, :)));
+                    end
+                end
+                data_Ref(:, :, sl, :, nn) = data_corr;
+            end
+        end 
+    end 
 
 else % FullEX
     
@@ -247,7 +234,6 @@ nDyns = size(data_Acc, 5); % number of time points
 window = padarray(col(tukeywin(phsN)) * col(tukeywin(phsN))', ...
     [Nro - phsN, Npe * nShots * R - phsN] ./ 2); 
 
-imgGRAPPA = zeros(Nro, Npe * nShots * R, nSlices, nDyns);
 imgGRAPPA_allData = zeros(Nro, Npe * nShots * R, nSlices, nDyns);
 img_indShot_ref = zeros(Nro, Npe * nShots * R, nShots, nCoils, nSlices);
 motionp = {};
@@ -412,9 +398,6 @@ for sl = 1 : nSlices
 
         end      
 
-        % combine individual shot recons across coils
-        imgGRAPPA(:, :, sl, dd) = ssq(img_indShot(:, :, :), 3); 
-
         disp(['All-Data GRAPPA Recon for dyn ' num2str(dd) '/' num2str(nDyns) '; slice ' num2str(sl) '/' num2str(nSlices)]);
         % get the zero-filled undersampled data for this shot
         data_zfilled_zpad = zeros([Nro + grappap.Nx - 1, Npe * nShots * R + grappap.Ny * R * nShots, nCoils, nShots]);
@@ -548,5 +531,5 @@ end % slice loop
 
 if ~isempty(fNameSave)
     save(fNameSave, 'img_Ref', 'img_Ref_comb', 'img_indShot', 'img_indShot_ref', ...
-        'imgGRAPPA', 'imgGRAPPA_allData', 'grappap', 'moco', 'motionp', 'phsCorr');
+        'imgGRAPPA_allData', 'grappap', 'moco', 'motionp', 'phsCorr');
 end
